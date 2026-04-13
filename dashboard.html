@@ -850,11 +850,13 @@
         }
 
         // If we don't have pagination data but have enquiries, create it
+        // Assume pagination is available if there's data; allow navigation
         if (!pagination && enquiries.length > 0) {
+          const pageNum = page || 1;
           pagination = {
-            page: 1,
-            total: enquiries.length,
-            totalPages: Math.ceil(enquiries.length / 7),
+            page: pageNum,
+            total: enquiries.length >= 7 ? (pageNum + 1) * 7 : enquiries.length,  // Estimate total based on page
+            totalPages: enquiries.length >= 7 ? pageNum + 2 : pageNum,  // Estimate totalPages
             limit: isViewAll ? 1000 : 7
           };
         }
@@ -1181,9 +1183,9 @@
     }
 
     function changePage(page) {
-      if (page < 1 || page > totalPages) return;
+      if (page < 1) return;  // Only block if less than 1
       currentPage = page;
-      loadDashboard(currentPage);
+      loadDashboard(page);
     }
 
     function toggleViewAll() {
