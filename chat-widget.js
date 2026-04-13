@@ -1,6 +1,6 @@
 // Chat Widget for WarehouseRide
 (function() {
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = 'https://gajeoo.github.io/api';
 
   const styles = `
     .wr-chat-widget-icon {

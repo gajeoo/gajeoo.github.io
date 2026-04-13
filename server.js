@@ -283,7 +283,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     await sendEmail(
       email,
       'Password Reset Request',
-      `<h2>Reset Your Password</h2><p>Click <a href="http://localhost:3000/reset-password.html?token=${token}">here</a> to reset your password. This link expires in 1 hour.</p>`
+      `<h2>Reset Your Password</h2><p>Click <a href="https://gajeoo.github.io/reset-password.html?token=${token}">here</a> to reset your password. This link expires in 1 hour.</p>`
     );
 
     res.json({ success: true, message: 'Reset link sent to email' });
@@ -608,8 +608,8 @@ app.post('/api/admin/create', async (req, res) => {
   }
 
   app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+    console.log(`Backend server running on https://gajeoo.github.io`);
     console.log('API endpoints available at /api/*');
-    console.log('Admin dashboard at http://localhost:' + PORT + '/admin.html');
+    console.log('Admin dashboard at https://gajeoo.github.io/admin.html');
   });
 })();
