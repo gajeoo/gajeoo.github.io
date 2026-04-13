@@ -428,6 +428,13 @@
             </tbody>
           </table>
         </div>
+        <div id="paginationControls" class="pagination-controls" style="display: none; margin-top: 1.5rem; text-align: center;">
+          <button id="prevPage" class="action-link" style="margin-right: 1rem;" onclick="changePage(currentPage - 1)">Previous</button>
+          <span id="pageInfo"></span>
+          <button id="nextPage" class="action-link" style="margin-left: 1rem;" onclick="changePage(currentPage + 1)">Next</button>
+          <br>
+          <button id="viewAllBtn" class="action-link" style="margin-top: 1rem;" onclick="toggleViewAll()">View All</button>
+        </div>
       </div>
 
       <div class="dashboard-section">
@@ -726,11 +733,20 @@
       window.location.href = 'signin.html';
     }
 
-    async function loadDashboard() {
+    // Pagination state
+    let currentPage = 1;
+    let totalPages = 1;
+    let isViewAll = false;
+
+    async function loadDashboard(page = 1) {
       try {
+        const enquiriesUrl = isViewAll
+          ? `${API_BASE}/enquiries/${currentUser.id}?limit=1000`
+          : `${API_BASE}/enquiries/${currentUser.id}?page=${page}&limit=5`;
+
         const [profileRes, enquiriesRes, chatRes] = await Promise.all([
           fetch(`${API_BASE}/customers/${currentUser.id}`),
-          fetch(`${API_BASE}/enquiries/${currentUser.id}`),
+          fetch(enquiriesUrl),
           fetch(`${API_BASE}/chat/${currentUser.id}`),
         ]);
 
@@ -739,11 +755,20 @@
         if (!chatRes.ok) throw new Error(`Chat fetch failed: ${chatRes.status}`);
 
         const profile = await profileRes.json();
-        const enquiries = await enquiriesRes.json() || [];
+        const enquiriesData = await enquiriesRes.json();
         const messages = await chatRes.json() || [];
+
+        const enquiries = enquiriesData.enquiries || enquiriesData;
+        const pagination = enquiriesData.pagination;
+
+        if (pagination) {
+          currentPage = pagination.page;
+          totalPages = pagination.totalPages;
+        }
 
         updateStats(enquiries);
         renderEnquiries(enquiries);
+        renderPagination(pagination);
         renderChat(messages);
         updateProfile(profile);
         updateLocalProfile(profile);
@@ -1001,11 +1026,48 @@
 
         alert('Enquiry deleted successfully.');
         closeEnquiryModal();
-        loadDashboard();
+        loadDashboard(currentPage);
       } catch (error) {
         console.error('Delete enquiry error:', error);
-        alert('Unable to delete enquiry. Please try again later.');
+        alert(error.message || 'Unable to delete enquiry. Please try again later.');
       }
+    }
+
+    function renderPagination(pagination) {
+      const controls = document.getElementById('paginationControls');
+      const pageInfo = document.getElementById('pageInfo');
+      const prevBtn = document.getElementById('prevPage');
+      const nextBtn = document.getElementById('nextPage');
+      const viewAllBtn = document.getElementById('viewAllBtn');
+
+      if (!pagination || pagination.totalPages <= 1) {
+        controls.style.display = 'none';
+        return;
+      }
+
+      controls.style.display = 'block';
+      pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+
+      prevBtn.disabled = pagination.page <= 1;
+      nextBtn.disabled = pagination.page >= pagination.totalPages;
+
+      if (isViewAll) {
+        viewAllBtn.textContent = 'Paginated View';
+      } else {
+        viewAllBtn.textContent = 'View All';
+      }
+    }
+
+    function changePage(page) {
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      loadDashboard(currentPage);
+    }
+
+    function toggleViewAll() {
+      isViewAll = !isViewAll;
+      currentPage = 1;
+      loadDashboard(currentPage);
     }
 
     document.getElementById('logoutBtn').addEventListener('click', () => {

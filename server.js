@@ -117,6 +117,16 @@ const initDb = async () => {
       )
     `);
 
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS footer_settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        working_hours TEXT,
+        social_media TEXT,
+        location TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Database tables initialized');
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -364,11 +374,29 @@ app.post('/api/enquiries', async (req, res) => {
 // Get Enquiries by Customer
 app.get('/api/enquiries/:customerId', async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
+
     const enquiries = await dbAll(
-      'SELECT * FROM enquiries WHERE customer_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM enquiries WHERE customer_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+      [req.params.customerId, limit, offset]
+    );
+
+    const total = await dbGet(
+      'SELECT COUNT(*) as count FROM enquiries WHERE customer_id = ?',
       [req.params.customerId]
     );
-    res.json(enquiries);
+
+    res.json({
+      enquiries,
+      pagination: {
+        page,
+        limit,
+        total: total.count,
+        totalPages: Math.ceil(total.count / limit)
+      }
+    });
   } catch (error) {
     console.error('Fetch enquiries error:', error);
     res.status(500).json({ error: 'Failed to fetch enquiries' });
@@ -388,13 +416,22 @@ app.delete('/api/enquiries/:enquiryId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid customer reference' });
     }
 
-    const enquiry = await dbGet('SELECT customer_id FROM enquiries WHERE id = ?', [req.params.enquiryId]);
+    const enquiry = await dbGet('SELECT customer_id, created_at FROM enquiries WHERE id = ?', [req.params.enquiryId]);
     if (!enquiry) {
       return res.status(404).json({ error: 'Enquiry not found' });
     }
 
     if (enquiry.customer_id !== resolvedCustomerId) {
       return res.status(403).json({ error: 'Unauthorized to delete this enquiry' });
+    }
+
+    // Check if enquiry is at least 20 days old
+    const createdDate = new Date(enquiry.created_at);
+    const now = new Date();
+    const daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
+
+    if (daysDiff < 20) {
+      return res.status(400).json({ error: 'Enquiries can only be deleted after 20 days' });
     }
 
     await dbRun('DELETE FROM enquiries WHERE id = ?', [req.params.enquiryId]);
@@ -617,6 +654,33 @@ app.post('/api/admin/create', async (req, res) => {
   } catch (error) {
     console.error('Create admin error:', error);
     res.status(500).json({ error: 'Failed to create admin' });
+  }
+});
+
+// Footer settings endpoints
+app.get('/api/footer', async (req, res) => {
+  try {
+    const footer = await dbGet('SELECT * FROM footer_settings WHERE id = 1');
+    res.json(footer || { working_hours: '', social_media: '', location: '' });
+  } catch (error) {
+    console.error('Get footer error:', error);
+    res.status(500).json({ error: 'Failed to get footer settings' });
+  }
+});
+
+app.put('/api/admin/footer', async (req, res) => {
+  try {
+    const { working_hours, social_media, location } = req.body;
+
+    await dbRun(`
+      INSERT OR REPLACE INTO footer_settings (id, working_hours, social_media, location, updated_at)
+      VALUES (1, ?, ?, ?, CURRENT_TIMESTAMP)
+    `, [working_hours || '', social_media || '', location || '']);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update footer error:', error);
+    res.status(500).json({ error: 'Failed to update footer settings' });
   }
 });
 

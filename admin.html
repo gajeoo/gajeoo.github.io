@@ -550,6 +550,26 @@
             </div>
           </div>
         </div>
+
+        <div class="admin-section">
+          <h2>Footer Settings</h2>
+          <form id="footerForm" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; padding: 1.5rem;">
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Working Hours</label>
+              <textarea id="footerWorkingHours" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"></textarea>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Social Media Links</label>
+              <textarea id="footerSocialMedia" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., Facebook: https://facebook.com/warehouseride&#10;Twitter: https://twitter.com/warehouseride"></textarea>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Location</label>
+              <textarea id="footerLocation" rows="2" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., 123 Transport Street, Logistics City, LC 12345"></textarea>
+            </div>
+            <button type="submit" style="padding: 0.75rem 1.5rem; background: var(--primary); color: #08101f; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Save Footer Settings</button>
+            <div id="footerMessage" style="margin-top: 1rem;"></div>
+          </form>
+        </div>
       </div>
     </main>
   </div>
@@ -635,6 +655,7 @@
         renderCustomersTable(customers);
         renderEnquiriesTable(enquiries);
         loadConversations();
+        loadFooterSettings();
       } catch (error) {
         console.error('Failed to load dashboard:', error);
       }
@@ -929,7 +950,49 @@
     }
 
 
+    // Footer settings functions
+    async function loadFooterSettings() {
+      try {
+        const response = await fetch(`${API_BASE}/footer`);
+        const footer = await response.json();
+
+        document.getElementById('footerWorkingHours').value = footer.working_hours || '';
+        document.getElementById('footerSocialMedia').value = footer.social_media || '';
+        document.getElementById('footerLocation').value = footer.location || '';
+      } catch (error) {
+        console.error('Failed to load footer settings:', error);
+      }
+    }
+
+    async function handleFooterSubmit(e) {
+      e.preventDefault();
+      const messageEl = document.getElementById('footerMessage');
+
+      const workingHours = document.getElementById('footerWorkingHours').value;
+      const socialMedia = document.getElementById('footerSocialMedia').value;
+      const location = document.getElementById('footerLocation').value;
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/footer`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ working_hours: workingHours, social_media: socialMedia, location: location }),
+        });
+
+        if (response.ok) {
+          messageEl.textContent = 'Footer settings saved successfully!';
+          messageEl.style.color = '#c4ffc4';
+        } else {
+          throw new Error('Failed to save footer settings');
+        }
+      } catch (error) {
+        messageEl.textContent = 'Failed to save footer settings. Please try again.';
+        messageEl.style.color = '#ffaeae';
+      }
+    }
+
     document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+    document.getElementById('footerForm').addEventListener('submit', handleFooterSubmit);
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('adminToken');
