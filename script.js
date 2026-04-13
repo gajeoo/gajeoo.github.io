@@ -3,7 +3,7 @@ const AUTH_FORM_SELECTOR = '.auth-form';
 const ACCOUNT_STATE_SELECTOR = '.account-state';
 const SIGN_OUT_BUTTON_ID = 'signOutButton';
 const CURRENT_USER_KEY = 'warehouseRideCurrent';
-const API_BASE = typeof window !== 'undefined' ? 'https://gajeoo.github.io/api' : '';
+const API_BASE = typeof window !== 'undefined' ? 'https://zealous-fulfillment-production-58f1.up.railway.app/api' : '';
 
 const contactForm = document.querySelector(CONTACT_FORM_SELECTOR);
 const authForm = document.querySelector(AUTH_FORM_SELECTOR);

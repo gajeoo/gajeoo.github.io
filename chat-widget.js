@@ -1,6 +1,6 @@
 // Chat Widget for WarehouseRide
 (function() {
-  const API_BASE = 'https://gajeoo.github.io/api';
+  const API_BASE = 'https://zealous-fulfillment-production-58f1.up.railway.app/api';
 
   const styles = `
     .wr-chat-widget-icon {
