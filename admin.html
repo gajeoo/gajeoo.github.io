@@ -239,6 +239,27 @@
       .stats-grid {
         grid-template-columns: 1fr;
       }
+
+      .chat-section {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .admin-table {
+        font-size: 0.8rem;
+      }
+
+      .admin-table th, .admin-table td {
+        padding: 0.5rem;
+        white-space: nowrap;
+      }
+
+      .admin-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     .chat-section {
@@ -477,41 +498,45 @@
 
         <div class="admin-section">
           <h2>Recent Customers</h2>
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Company</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Company</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
             </thead>
             <tbody id="customersTableBody">
               <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <div class="admin-section">
           <h2>Enquiries</h2>
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Email</th>
-                <th>Service</th>
-                <th>Message</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="enquiriesTableBody">
-              <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
-            </tbody>
-          </table>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Service</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="enquiriesTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="admin-section">
@@ -550,7 +575,7 @@
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:5000/api';
+    const API_BASE = 'https://zealous-fulfillment-production-58f1.up.railway.app/api';
     let currentAdmin = null;
 
     function closeModal(selector) {

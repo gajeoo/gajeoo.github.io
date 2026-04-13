@@ -236,6 +236,20 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .dashboard-table {
+        font-size: 0.8rem;
+      }
+
+      .dashboard-table th, .dashboard-table td {
+        padding: 0.5rem;
+        white-space: nowrap;
+      }
+
+      .dashboard-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     .modal {
@@ -391,27 +405,29 @@
           <h3>Your Enquiries</h3>
           <a href="index.html#contact" class="action-link">+ New Enquiry</a>
         </div>
-        <table class="dashboard-table">
-          <thead>
-            <tr>
-              <th>Service Type</th>
-              <th>Message</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="enquiriesBody">
-            <tr>
-              <td colspan="5" style="text-align: center; padding: 2rem;">
-                <div class="empty-state">
-                  <p>No enquiries yet</p>
-                  <p style="font-size: 0.9rem;">Start your first transport request</p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="dashboard-table-wrapper">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Service Type</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enquiriesBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem;">
+                  <div class="empty-state">
+                    <p>No enquiries yet</p>
+                    <p style="font-size: 0.9rem;">Start your first transport request</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="dashboard-section">
@@ -859,6 +875,12 @@
         console.error('enquiriesBody element not found');
         return;
       }
+
+      // Cache enquiries for modal access
+      window.enquiryCache = {};
+      enquiries.forEach(e => {
+        window.enquiryCache[e.id] = e;
+      });
 
       if (!enquiries || enquiries.length === 0) {
         tbody.innerHTML = `
