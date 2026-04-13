@@ -821,7 +821,7 @@
     async function loadDashboard(page = 1) {
       try {
         const enquiriesUrl = isViewAll
-          ? `${API_BASE}/enquiries/${currentUser.id}?limit=1000`
+          ? `${API_BASE}/enquiries/${currentUser.id}?page=1&limit=1000`
           : `${API_BASE}/enquiries/${currentUser.id}?page=${page}&limit=7`;
 
         const [profileRes, enquiriesRes, chatRes] = await Promise.all([
@@ -838,8 +838,26 @@
         const enquiriesData = await enquiriesRes.json();
         const messages = await chatRes.json() || [];
 
-        const enquiries = enquiriesData.enquiries || enquiriesData;
-        const pagination = enquiriesData.pagination;
+        // Handle both array and paginated response formats
+        let enquiries = [];
+        let pagination = null;
+        
+        if (Array.isArray(enquiriesData)) {
+          enquiries = enquiriesData;
+        } else {
+          enquiries = enquiriesData.enquiries || [];
+          pagination = enquiriesData.pagination || null;
+        }
+
+        // If we don't have pagination data but have enquiries, create it
+        if (!pagination && enquiries.length > 0) {
+          pagination = {
+            page: 1,
+            total: enquiries.length,
+            totalPages: Math.ceil(enquiries.length / 7),
+            limit: isViewAll ? 1000 : 7
+          };
+        }
 
         if (pagination) {
           currentPage = pagination.page;
@@ -1136,8 +1154,8 @@
       const nextBtn = document.getElementById('nextPage');
       const viewAllBtn = document.getElementById('viewAllBtn');
 
-      // Show pagination if we have pagination data and either have multiple pages or more items than current page
-      if (!pagination || (pagination.totalPages === 1 && pagination.total <= 7)) {
+      // Show pagination controls if we have more than 7 enquiries total
+      if (!pagination || pagination.total <= 7) {
         controls.classList.remove('visible');
         return;
       }

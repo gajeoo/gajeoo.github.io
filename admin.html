@@ -743,7 +743,7 @@
     async function loadDashboard(page = 1) {
       try {
         const enquiriesUrl = adminIsViewAll
-          ? `${API_BASE}/admin/enquiries?limit=1000`
+          ? `${API_BASE}/admin/enquiries?page=1&limit=1000`
           : `${API_BASE}/admin/enquiries?page=${page}&limit=7`;
 
         const customersRes = await fetch(`${API_BASE}/admin/customers`);
@@ -751,8 +751,27 @@
 
         const customers = await customersRes.json();
         const enquiriesData = await enquiriesRes.json();
-        const enquiries = enquiriesData.enquiries || enquiriesData;
-        const pagination = enquiriesData.pagination;
+        
+        // Handle both array and paginated response formats
+        let enquiries = [];
+        let pagination = null;
+        
+        if (Array.isArray(enquiriesData)) {
+          enquiries = enquiriesData;
+        } else {
+          enquiries = enquiriesData.enquiries || [];
+          pagination = enquiriesData.pagination || null;
+        }
+
+        // If we don't have pagination data but have enquiries, create it
+        if (!pagination && enquiries.length > 0) {
+          pagination = {
+            page: 1,
+            total: enquiries.length,
+            totalPages: Math.ceil(enquiries.length / 7),
+            limit: adminIsViewAll ? 1000 : 7
+          };
+        }
 
         if (pagination) {
           currentAdminPage = pagination.page;
@@ -1067,8 +1086,8 @@
       const nextBtn = document.getElementById('adminNextPage');
       const viewAllBtn = document.getElementById('adminViewAllBtn');
 
-      // Show pagination if we have pagination data and either have multiple pages or more items than current page
-      if (!pagination || (pagination.totalPages === 1 && pagination.total <= 7)) {
+      // Show pagination controls if we have more than 7 enquiries total
+      if (!pagination || pagination.total <= 7) {
         controls.classList.remove('visible');
         return;
       }
