@@ -1019,7 +1019,7 @@
         return;
       }
 
-      tbody.innerHTML = enquiries.slice(0, 7).map(e => {
+      tbody.innerHTML = (isViewAll ? enquiries : enquiries.slice(0, 7)).map(e => {
         const date = new Date(e.created_at).toLocaleDateString(undefined, {
           month: 'short',
           day: 'numeric',

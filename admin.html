@@ -821,7 +821,7 @@
         return;
       }
 
-      tbody.innerHTML = enquiries.slice(0, 7).map(e => `
+      tbody.innerHTML = (adminIsViewAll ? enquiries : enquiries.slice(0, 7)).map(e => `
         <tr>
           <td><strong>${e.name}</strong></td>
           <td>${e.email}</td>
