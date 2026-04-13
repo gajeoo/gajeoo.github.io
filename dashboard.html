@@ -1161,14 +1161,21 @@
       }
 
       controls.classList.add('visible');
-      pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total})`;
-
-      prevBtn.disabled = pagination.page <= 1;
-      nextBtn.disabled = pagination.page >= pagination.totalPages;
 
       if (isViewAll) {
-        viewAllBtn.textContent = 'Paginated View (7 per page)';
+        // In View All mode, hide pagination buttons and show toggle only
+        pageInfo.style.display = 'none';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        viewAllBtn.textContent = 'Back to Paginated View (7 per page)';
       } else {
+        // In paginated mode, show all pagination controls
+        pageInfo.style.display = 'inline';
+        prevBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'inline-block';
+        pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total})`;
+        prevBtn.disabled = pagination.page <= 1;
+        nextBtn.disabled = pagination.page >= pagination.totalPages;
         viewAllBtn.textContent = 'View All Enquiries';
       }
     }
