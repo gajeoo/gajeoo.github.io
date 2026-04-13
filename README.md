@@ -94,8 +94,8 @@ A fully-developed website for WarehouseRide transportation business with custome
 ### Admin Access
 1. Open `admin.html` (or `http://localhost:5000/admin.html`)
 2. **Default Credentials**:
-   - Username: `admin`
-   - Password: `admin123`
+   - Username: `*****`
+   - Password: `********`
 3. View all customers and enquiries
 4. Click "View" to see detailed customer information
 5. Update enquiry status
