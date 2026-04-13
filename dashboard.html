@@ -931,8 +931,56 @@
       container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${html}</div>`;
     }
 
-    function viewEnquiry(enquiryId, serviceType) {
-      alert(`Service: ${serviceType || 'Unknown'}\nEnquiry ID: ${enquiryId}\n\nUse the chat widget to communicate with our team about this enquiry.`);
+    function viewEnquiry(enquiryId) {
+      openEnquiryModal(enquiryId);
+    }
+
+    function openEnquiryModal(enquiryId) {
+      const enquiry = window.enquiryCache?.[enquiryId];
+      if (!enquiry) {
+        alert('Unable to load enquiry details.');
+        return;
+      }
+
+      const modal = document.getElementById('enquiryModal');
+      if (!modal) return;
+
+      document.getElementById('enquiryModalService').textContent = enquiry.service_type || 'Unknown';
+      document.getElementById('enquiryModalMessage').textContent = enquiry.message || 'No message provided.';
+      document.getElementById('enquiryModalStatus').textContent = enquiry.status || 'new';
+      document.getElementById('enquiryModalCreated').textContent = new Date(enquiry.created_at).toLocaleString();
+      document.getElementById('deleteEnquiryBtn').dataset.enquiryId = enquiry.id;
+
+      modal.style.display = 'flex';
+    }
+
+    function closeEnquiryModal() {
+      const modal = document.getElementById('enquiryModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function deleteEnquiry(enquiryId) {
+      if (!confirm('Delete this enquiry? This cannot be undone.')) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/enquiries/${encodeURIComponent(enquiryId)}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerId: currentUser.id }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Delete failed');
+        }
+
+        alert('Enquiry deleted successfully.');
+        closeEnquiryModal();
+        loadDashboard();
+      } catch (error) {
+        console.error('Delete enquiry error:', error);
+        alert('Unable to delete enquiry. Please try again later.');
+      }
     }
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -973,6 +1021,21 @@
       const settingsForm = document.getElementById('settingsForm');
       if (settingsForm) {
         settingsForm.addEventListener('submit', saveSettings);
+      }
+
+      const closeEnquiryBtn = document.getElementById('closeEnquiryModal');
+      if (closeEnquiryBtn) {
+        closeEnquiryBtn.addEventListener('click', closeEnquiryModal);
+      }
+
+      const deleteEnquiryBtn = document.getElementById('deleteEnquiryBtn');
+      if (deleteEnquiryBtn) {
+        deleteEnquiryBtn.addEventListener('click', () => {
+          const enquiryId = deleteEnquiryBtn.dataset.enquiryId;
+          if (enquiryId) {
+            deleteEnquiry(enquiryId);
+          }
+        });
       }
     });
 
@@ -1158,6 +1221,23 @@
     loadDashboard();
   </script>
   <script src="chat-widget.js"></script>
+
+  <!-- Enquiry Details Modal -->
+  <div id="enquiryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Enquiry Details</h3>
+        <button id="closeEnquiryModal" class="close-btn">&times;</button>
+      </div>
+      <div style="display: grid; gap: 1rem;">
+        <div><strong>Service:</strong> <span id="enquiryModalService">-</span></div>
+        <div><strong>Status:</strong> <span id="enquiryModalStatus">-</span></div>
+        <div><strong>Submitted:</strong> <span id="enquiryModalCreated">-</span></div>
+        <div><strong>Message:</strong><p id="enquiryModalMessage" style="margin: 0.5rem 0 0; white-space: pre-wrap;">-</p></div>
+        <button id="deleteEnquiryBtn" class="button button-danger" type="button" style="width: 100%;">Delete Enquiry</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal">

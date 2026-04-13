@@ -375,6 +375,36 @@ app.get('/api/enquiries/:customerId', async (req, res) => {
   }
 });
 
+// Delete Enquiry
+app.delete('/api/enquiries/:enquiryId', async (req, res) => {
+  try {
+    const { customerId } = req.body;
+    if (!customerId) {
+      return res.status(400).json({ error: 'Customer ID required' });
+    }
+
+    const resolvedCustomerId = await resolveCustomerId(customerId);
+    if (!resolvedCustomerId) {
+      return res.status(400).json({ error: 'Invalid customer reference' });
+    }
+
+    const enquiry = await dbGet('SELECT customer_id FROM enquiries WHERE id = ?', [req.params.enquiryId]);
+    if (!enquiry) {
+      return res.status(404).json({ error: 'Enquiry not found' });
+    }
+
+    if (enquiry.customer_id !== resolvedCustomerId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this enquiry' });
+    }
+
+    await dbRun('DELETE FROM enquiries WHERE id = ?', [req.params.enquiryId]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete enquiry error:', error);
+    res.status(500).json({ error: 'Failed to delete enquiry' });
+  }
+});
+
 // CHAT ROUTES
 
 // Save Chat Message
