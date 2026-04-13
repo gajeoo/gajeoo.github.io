@@ -209,6 +209,23 @@
       color: var(--primary);
     }
 
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .pagination-controls button {
+      margin: 0 0.5rem;
+    }
+
+    #pageInfo {
+      margin: 0 1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
     @media (max-width: 960px) {
       .dashboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -249,6 +266,64 @@
       .dashboard-table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+      }
+
+      .pagination-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .pagination-controls button {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-hero {
+        padding: 1rem;
+      }
+
+      .dashboard-hero h2 {
+        font-size: 1.3rem;
+      }
+
+      .dashboard-stat-number {
+        font-size: 1.8rem;
+      }
+
+      .section-header h3 {
+        font-size: 1.2rem;
+      }
+
+      .dashboard-table {
+        font-size: 0.7rem;
+      }
+
+      .dashboard-table th, .dashboard-table td {
+        padding: 0.3rem;
+      }
+
+      .profile-box {
+        padding: 1rem;
+      }
+
+      .profile-item {
+        padding: 0.5rem 0;
+      }
+
+      .pagination-controls {
+        margin-top: 1rem;
+      }
+
+      .pagination-controls button {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.5rem !important;
+        margin: 0.25rem !important;
+      }
+
+      #pageInfo {
+        font-size: 0.85rem;
       }
     }
 
@@ -1026,11 +1101,20 @@
           body: JSON.stringify({ customerId: currentUser.id }),
         });
 
-        const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.error || 'Delete failed');
+          const contentType = response.headers.get('content-type');
+          let error = 'Delete failed';
+          
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            error = data.error || error;
+          } else {
+            error = `Server error: ${response.status} ${response.statusText}`;
+          }
+          throw new Error(error);
         }
 
+        const data = await response.json();
         alert('Enquiry deleted successfully.');
         closeEnquiryModal();
         loadDashboard(currentPage);
