@@ -697,7 +697,7 @@
         return;
       }
 
-      tbody.innerHTML = customers.map(c => `
+      tbody.innerHTML = customers.slice(0, 7).map(c => `
         <tr>
           <td><strong>${c.name}</strong></td>
           <td>${c.email}</td>
@@ -716,7 +716,7 @@
         return;
       }
 
-      tbody.innerHTML = enquiries.map(e => `
+      tbody.innerHTML = enquiries.slice(0, 7).map(e => `
         <tr>
           <td><strong>${e.name}</strong></td>
           <td>${e.email}</td>

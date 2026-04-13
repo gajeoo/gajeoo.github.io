@@ -921,7 +921,7 @@
         return;
       }
 
-      tbody.innerHTML = enquiries.map(e => {
+      tbody.innerHTML = enquiries.slice(0, 7).map(e => {
         const date = new Date(e.created_at).toLocaleDateString(undefined, {
           month: 'short',
           day: 'numeric',
@@ -930,6 +930,13 @@
 
         const statusBadge = e.status || 'new';
         const message = e.message ? (e.message.length > 60 ? e.message.substring(0, 60) + '...' : e.message) : 'No details';
+        
+        // Calculate days since enquiry was created
+        const createdDate = new Date(e.created_at);
+        const now = new Date();
+        const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+        const canDelete = daysDiff >= 20;
+        const daysRemaining = Math.max(0, 20 - daysDiff);
 
         return `
           <tr>
@@ -937,9 +944,9 @@
             <td>${message}</td>
             <td><span class="status-badge ${statusBadge}">${statusBadge}</span></td>
             <td>${date}</td>
-                        <td>
+            <td>
               <button type="button" class="action-link" onclick="openEnquiryModal('${e.id}')">View</button>
-              <button type="button" class="action-link" onclick="deleteEnquiry('${e.id}')">Delete</button>
+              ${canDelete ? `<button type="button" class="action-link" onclick="deleteEnquiry('${e.id}')">Delete</button>` : `<button type="button" class="action-link" disabled style="opacity: 0.5; cursor: not-allowed;" title="Can delete in ${daysRemaining} days">Delete in ${daysRemaining}d</button>`}
             </td>
           </tr>
         `;
