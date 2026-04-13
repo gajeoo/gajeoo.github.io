@@ -1157,5 +1157,30 @@
     loadDashboard();
   </script>
   <script src="chat-widget.js"></script>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Account Settings</h3>
+        <button id="closeSettings" class="close-btn">&times;</button>
+      </div>
+      <form id="settingsForm">
+        <label>
+          Full Name
+          <input type="text" id="settingsName" required />
+        </label>
+        <label>
+          Company
+          <input type="text" id="settingsCompany" />
+        </label>
+        <label>
+          Phone Number
+          <input type="tel" id="settingsPhone" />
+        </label>
+        <button type="submit" style="width: 100%; padding: 1rem; background: #5dd1ff; color: #08101f; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; margin-top: 1rem;">Save Changes</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
