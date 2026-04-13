@@ -537,6 +537,13 @@
               </tbody>
             </table>
           </div>
+          <div id="adminPaginationControls" class="pagination-controls" style="display: none; margin-top: 1.5rem; text-align: center;">
+            <button id="adminPrevPage" class="action-link" style="margin-right: 1rem;" onclick="changeAdminPage(currentAdminPage - 1)">Previous</button>
+            <span id="adminPageInfo"></span>
+            <button id="adminNextPage" class="action-link" style="margin-left: 1rem;" onclick="changeAdminPage(currentAdminPage + 1)">Next</button>
+            <br>
+            <button id="adminViewAllBtn" class="action-link" style="margin-top: 1rem;" onclick="toggleAdminViewAll()">View All</button>
+          </div>
         </div>
 
         <div class="admin-section">
@@ -643,17 +650,33 @@
       }
     }
 
-    async function loadDashboard() {
+    let currentAdminPage = 1;
+    let adminTotalPages = 1;
+    let adminIsViewAll = false;
+
+    async function loadDashboard(page = 1) {
       try {
+        const enquiriesUrl = adminIsViewAll
+          ? `${API_BASE}/admin/enquiries?limit=1000`
+          : `${API_BASE}/admin/enquiries?page=${page}&limit=7`;
+
         const customersRes = await fetch(`${API_BASE}/admin/customers`);
-        const enquiriesRes = await fetch(`${API_BASE}/admin/enquiries`);
+        const enquiriesRes = await fetch(enquiriesUrl);
 
         const customers = await customersRes.json();
-        const enquiries = await enquiriesRes.json();
+        const enquiriesData = await enquiriesRes.json();
+        const enquiries = enquiriesData.enquiries || enquiriesData;
+        const pagination = enquiriesData.pagination;
+
+        if (pagination) {
+          currentAdminPage = pagination.page;
+          adminTotalPages = pagination.totalPages;
+        }
 
         updateStats(customers, enquiries);
         renderCustomersTable(customers);
         renderEnquiriesTable(enquiries);
+        renderAdminPagination(pagination);
         loadConversations();
         loadFooterSettings();
       } catch (error) {
@@ -949,6 +972,44 @@
       }
     }
 
+
+    // Admin pagination functions
+    function renderAdminPagination(pagination) {
+      const controls = document.getElementById('adminPaginationControls');
+      const pageInfo = document.getElementById('adminPageInfo');
+      const prevBtn = document.getElementById('adminPrevPage');
+      const nextBtn = document.getElementById('adminNextPage');
+      const viewAllBtn = document.getElementById('adminViewAllBtn');
+
+      if (!pagination || pagination.totalPages <= 1) {
+        controls.style.display = 'none';
+        return;
+      }
+
+      controls.style.display = 'block';
+      pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages}`;
+
+      prevBtn.disabled = pagination.page <= 1;
+      nextBtn.disabled = pagination.page >= pagination.totalPages;
+
+      if (adminIsViewAll) {
+        viewAllBtn.textContent = 'Paginated View';
+      } else {
+        viewAllBtn.textContent = 'View All';
+      }
+    }
+
+    function changeAdminPage(page) {
+      if (page < 1 || page > adminTotalPages) return;
+      currentAdminPage = page;
+      loadDashboard(currentAdminPage);
+    }
+
+    function toggleAdminViewAll() {
+      adminIsViewAll = !adminIsViewAll;
+      currentAdminPage = 1;
+      loadDashboard(currentAdminPage);
+    }
 
     // Footer settings functions
     async function loadFooterSettings() {

@@ -742,7 +742,7 @@
       try {
         const enquiriesUrl = isViewAll
           ? `${API_BASE}/enquiries/${currentUser.id}?limit=1000`
-          : `${API_BASE}/enquiries/${currentUser.id}?page=${page}&limit=5`;
+          : `${API_BASE}/enquiries/${currentUser.id}?page=${page}&limit=7`;
 
         const [profileRes, enquiriesRes, chatRes] = await Promise.all([
           fetch(`${API_BASE}/customers/${currentUser.id}`),

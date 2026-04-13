@@ -375,7 +375,7 @@ app.post('/api/enquiries', async (req, res) => {
 app.get('/api/enquiries/:customerId', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
+    const limit = parseInt(req.query.limit) || 7;
     const offset = (page - 1) * limit;
 
     const enquiries = await dbAll(
@@ -568,13 +568,29 @@ app.get('/api/admin/customers', async (req, res) => {
 // Get All Enquiries
 app.get('/api/admin/enquiries', async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 7;
+    const offset = (page - 1) * limit;
+
     const enquiries = await dbAll(`
       SELECT e.id, e.customer_id, c.name, c.email, e.service_type, e.message, e.status, e.created_at
       FROM enquiries e
       JOIN customers c ON e.customer_id = c.id
       ORDER BY e.created_at DESC
-    `);
-    res.json(enquiries);
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
+
+    const total = await dbGet('SELECT COUNT(*) as count FROM enquiries');
+    
+    res.json({
+      enquiries,
+      pagination: {
+        page,
+        limit,
+        total: total.count,
+        totalPages: Math.ceil(total.count / limit)
+      }
+    });
   } catch (error) {
     console.error('Fetch enquiries error:', error);
     res.status(500).json({ error: 'Failed to fetch enquiries' });
