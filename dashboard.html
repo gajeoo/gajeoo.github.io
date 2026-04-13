@@ -696,7 +696,7 @@
   </footer>
 
   <script>
-    const API_BASE = 'http://localhost:5000/api';
+    const API_BASE = 'https://zealous-fulfillment-production-58f1.up.railway.app/api';
     const currentUser = (() => {
       const raw = localStorage.getItem('warehouseRideCurrent');
       try {
@@ -963,17 +963,18 @@
       });
     }
 
-    // Close settings button
-    const closeSettingsBtn = document.getElementById('closeSettings');
-    if (closeSettingsBtn) {
-      closeSettingsBtn.addEventListener('click', closeSettingsModal);
-    }
+    // Close settings button and form submission should wait for the full DOM.
+    document.addEventListener('DOMContentLoaded', () => {
+      const closeSettingsBtn = document.getElementById('closeSettings');
+      if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', closeSettingsModal);
+      }
 
-    // Settings form submission
-    const settingsForm = document.getElementById('settingsForm');
-    if (settingsForm) {
-      settingsForm.addEventListener('submit', saveSettings);
-    }
+      const settingsForm = document.getElementById('settingsForm');
+      if (settingsForm) {
+        settingsForm.addEventListener('submit', saveSettings);
+      }
+    });
 
     // Address Autocomplete Function
     async function fetchAddressSuggestions(query) {
