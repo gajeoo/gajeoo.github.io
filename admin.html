@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | WarehouseRide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .admin-header {
+      background: linear-gradient(135deg, #39a7dc, #5dd1ff);
+      color: #08101f;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      border-radius: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-header h1 {
+      color: #08101f;
+      margin: 0;
+    }
+
+    .admin-section {
+      margin-bottom: 3rem;
+    }
+
+    .admin-section h2 {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-table thead {
+      background: rgba(93, 209, 255, 0.1);
+    }
+
+    .admin-table th, .admin-table td {
+      padding: 1.2rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-table th {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-table tr:hover {
+      background: rgba(93, 209, 255, 0.08);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-badge.new {
+      background: rgba(255, 224, 102, 0.2);
+      color: #ffe066;
+    }
+
+    .status-badge.in-progress {
+      background: rgba(93, 209, 255, 0.2);
+      color: #5dd1ff;
+    }
+
+    .status-badge.resolved {
+      background: rgba(196, 255, 196, 0.2);
+      color: #c4ffc4;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: rgba(93, 209, 255, 0.2);
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: rgba(93, 209, 255, 0.4);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .login-container {
+      max-width: 400px;
+      margin: 5rem auto;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      padding: 2rem;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .login-form label {
+      font-weight: 600;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    .dashboard-container {
+      display: none;
+    }
+
+    .dashboard-container.active {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(93, 209, 255, 0.1);
+      border: 1px solid rgba(93, 209, 255, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 960px) {
+      .admin-table {
+        font-size: 0.9rem;
+      }
+
+      .admin-table th, .admin-table td {
+        padding: 0.8rem 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chat-section {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+      height: 600px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    .chat-conversations {
+      background: rgba(255, 255, 255, 0.02);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .conversation-item {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .conversation-item:hover {
+      background: rgba(93, 209, 255, 0.1);
+    }
+
+    .conversation-item.active {
+      background: rgba(93, 209, 255, 0.2);
+      border-left: 3px solid var(--primary);
+    }
+
+    .conversation-name {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+    }
+
+    .conversation-email {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .unread-badge {
+      background: #ff6b6b;
+      color: white;
+      border-radius: 999px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .chat-header-info {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .chat-header-info h3 {
+      margin: 0 0 0.25rem;
+      color: var(--primary);
+    }
+
+    .chat-header-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .chat-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .chat-message-admin {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .chat-message-customer {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.5rem;
+    }
+
+    .chat-message-content {
+      max-width: 70%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .chat-message-admin .chat-message-content {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f5f7fb;
+    }
+
+    .chat-message-customer .chat-message-content {
+      background: linear-gradient(135deg, #39a7dc, #5dd1ff);
+      color: #08101f;
+      border: none;
+    }
+
+    .chat-input-admin {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .chat-input-admin textarea {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #f5f7fb;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: none;
+      max-height: 100px;
+    }
+
+    .chat-input-admin textarea:focus {
+      outline: none;
+      border-color: #5dd1ff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .chat-input-admin button {
+      background: linear-gradient(135deg, #5dd1ff, #ffe066);
+      border: none;
+      border-radius: 0.75rem;
+      color: #08101f;
+      padding: 0.75rem 1.2rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease;
+      height: fit-content;
+    }
+
+    .chat-input-admin button:hover {
+      transform: translateY(-2px);
+    }
+
+    .no-conversation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginContainer">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">Default: admin / admin123</p>
+      <form class="login-form" id="adminLoginForm">
+        <label for="adminUsername">Username</label>
+        <input id="adminUsername" type="text" placeholder="admin" required />
+
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" type="password" placeholder="••••••••" required />
+
+        <p class="form-message" id="loginMessage" style="min-height: 1.5rem;"></p>
+
+        <button type="submit" class="button button-primary">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="dashboard-container" id="dashboardContainer">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand" style="text-decoration: none;">
+          <img src="logo.svg" alt="WarehouseRide logo" class="brand-logo" />
+          <div>
+            <h1 class="brand-name">WarehouseRide Admin</h1>
+          </div>
+        </a>
+        <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="header-actions">
+          <a href="index.html" class="button button-secondary">Back to Home</a>
+          <button id="logoutBtn" class="button button-secondary" style="display: none;">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="admin-header">
+          <h1>Dashboard</h1>
+          <p id="adminGreeting"></p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="totalCustomers">0</div>
+            <div class="stat-label">Total Customers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="newEnquiries">0</div>
+            <div class="stat-label">New Enquiries</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="resolvedEnquiries">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <h2>Recent Customers</h2>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Company</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody">
+              <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-section">
+          <h2>Enquiries</h2>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Service</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enquiriesTableBody">
+              <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-section">
+          <h2>Customer Conversations</h2>
+          <div class="chat-section">
+            <div class="chat-conversations" id="conversationsList">
+              <div style="padding: 1.5rem; text-align: center; color: var(--text-muted);">No conversations</div>
+            </div>
+            <div class="chat-panel" id="chatPanel">
+              <div class="no-conversation">Select a conversation to chat with the customer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="customerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Customer Details</h3>
+        <button class="close-btn" onclick="closeModal('#customerModal')">&times;</button>
+      </div>
+      <div id="customerModalBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="enquiryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Enquiry Details</h3>
+        <button class="close-btn" onclick="closeModal('#enquiryModal')">&times;</button>
+      </div>
+      <div id="enquiryModalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+    let currentAdmin = null;
+
+    function closeModal(selector) {
+      document.querySelector(selector).classList.remove('active');
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+      const messageEl = document.getElementById('loginMessage');
+
+      try {
+        const response = await fetch(`${API_BASE}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          messageEl.textContent = data.error || 'Login failed';
+          messageEl.style.color = '#ffaeae';
+          return;
+        }
+
+        currentAdmin = data;
+        localStorage.setItem('adminToken', JSON.stringify(data));
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('dashboardContainer').classList.add('active');
+        document.getElementById('adminGreeting').textContent = `Welcome, ${username}`;
+        loadDashboard();
+      } catch (error) {
+        messageEl.textContent = 'Connection error. Ensure server is running.';
+        messageEl.style.color = '#ffaeae';
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        const customersRes = await fetch(`${API_BASE}/admin/customers`);
+        const enquiriesRes = await fetch(`${API_BASE}/admin/enquiries`);
+
+        const customers = await customersRes.json();
+        const enquiries = await enquiriesRes.json();
+
+        updateStats(customers, enquiries);
+        renderCustomersTable(customers);
+        renderEnquiriesTable(enquiries);
+        loadConversations();
+      } catch (error) {
+        console.error('Failed to load dashboard:', error);
+      }
+    }
+
+    function updateStats(customers, enquiries) {
+      document.getElementById('totalCustomers').textContent = customers.length;
+      document.getElementById('newEnquiries').textContent = enquiries.filter(e => e.status === 'new').length;
+      document.getElementById('resolvedEnquiries').textContent = enquiries.filter(e => e.status === 'resolved').length;
+    }
+
+    function renderCustomersTable(customers) {
+      const tbody = document.getElementById('customersTableBody');
+      if (customers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No customers yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = customers.map(c => `
+        <tr>
+          <td><strong>${c.name}</strong></td>
+          <td>${c.email}</td>
+          <td>${c.phone || '-'}</td>
+          <td>${c.company || '-'}</td>
+          <td>${formatDate(c.created_at)}</td>
+          <td><button class="action-btn" onclick="viewCustomerDetails('${c.id}')">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderEnquiriesTable(enquiries) {
+      const tbody = document.getElementById('enquiriesTableBody');
+      if (enquiries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No enquiries yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = enquiries.map(e => `
+        <tr>
+          <td><strong>${e.name}</strong></td>
+          <td>${e.email}</td>
+          <td>${e.service_type}</td>
+          <td>${(e.message || '').substring(0, 40)}...</td>
+          <td><span class="status-badge ${e.status}">${e.status}</span></td>
+          <td>${formatDate(e.created_at)}</td>
+          <td><button class="action-btn" onclick="viewEnquiryDetails('${e.id}')">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function viewCustomerDetails(customerId) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/customers/${customerId}`);
+        const data = await res.json();
+
+        document.getElementById('customerModalBody').innerHTML = `
+          <p><strong>Name:</strong> ${data.customer.name}</p>
+          <p><strong>Email:</strong> ${data.customer.email}</p>
+          <p><strong>Phone:</strong> ${data.customer.phone || '-'}</p>
+          <p><strong>Company:</strong> ${data.customer.company || '-'}</p>
+          <p><strong>Joined:</strong> ${formatDate(data.customer.created_at)}</p>
+
+          <h4 style="margin-top: 1.5rem;">Enquiries (${data.enquiries.length})</h4>
+          ${data.enquiries.length === 0 ? '<p>No enquiries</p>' : `
+            <ul style="list-style: none; padding: 0;">
+              ${data.enquiries.map(e => `<li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">${e.service_type} - <span class="status-badge ${e.status}">${e.status}</span></li>`).join('')}
+            </ul>
+          `}
+
+          <h4 style="margin-top: 1.5rem;">Chat (${data.messages.length})</h4>
+          ${data.messages.length === 0 ? '<p>No messages</p>' : `
+            <div style="max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 0.5rem;">
+              ${data.messages.map(m => `<p style="margin: 0.5rem 0; font-size: 0.9rem;"><strong>${m.sender}:</strong> ${m.message}</p>`).join('')}
+            </div>
+          `}
+        `;
+
+        document.getElementById('customerModal').classList.add('active');
+      } catch (error) {
+        console.error('Failed to load customer details:', error);
+      }
+    }
+
+    async function viewEnquiryDetails(enquiryId) {
+      try {
+        const enquiries = await (await fetch(`${API_BASE}/admin/enquiries`)).json();
+        const enquiry = enquiries.find(e => e.id === enquiryId);
+
+        document.getElementById('enquiryModalBody').innerHTML = `
+          <p><strong>Customer:</strong> ${enquiry.name} (${enquiry.email})</p>
+          <p><strong>Service:</strong> ${enquiry.service_type}</p>
+          <p><strong>Date:</strong> ${formatDate(enquiry.created_at)}</p>
+          <p><strong>Message:</strong></p>
+          <p style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 0.5rem;">${enquiry.message || 'No message'}</p>
+
+          <label style="margin-top: 1rem; display: block; font-weight: 600;">Update Status</label>
+          <select id="statusSelect" style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text);">
+            <option value="new" ${enquiry.status === 'new' ? 'selected' : ''}>New</option>
+            <option value="in-progress" ${enquiry.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+            <option value="resolved" ${enquiry.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+          </select>
+
+          <button class="button button-primary" style="width: 100%; margin-top: 1rem;" id="updateStatusBtn">Save Status</button>
+        `;
+
+        document.getElementById('updateStatusBtn').onclick = async () => {
+          const status = document.getElementById('statusSelect').value;
+          await updateEnquiryStatus(enquiryId, status);
+          closeModal('#enquiryModal');
+          loadDashboard();
+        };
+
+        document.getElementById('enquiryModal').classList.add('active');
+      } catch (error) {
+        console.error('Failed to load enquiry details:', error);
+      }
+    }
+
+    async function updateEnquiryStatus(enquiryId, status) {
+      try {
+        await fetch(`${API_BASE}/admin/enquiries/${enquiryId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status }),
+        });
+      } catch (error) {
+        console.error('Failed to update status:', error);
+      }
+    }
+
+    // Chat functionality
+    let selectedCustomerId = null;
+    let allCustomers = [];
+    let allMessages = {};
+    let adminPollInterval = null;
+
+    async function loadConversations() {
+      try {
+        const customersRes = await fetch(`${API_BASE}/admin/customers`);
+        const customers = await customersRes.json();
+        allCustomers = customers;
+
+        // Load messages for each customer
+        for (let customer of customers) {
+          const messagesRes = await fetch(`${API_BASE}/chat/${customer.id}`);
+          allMessages[customer.id] = await messagesRes.json();
+        }
+
+        renderConversationsList();
+      } catch (error) {
+        console.error('Failed to load conversations:', error);
+      }
+    }
+
+    function renderConversationsList() {
+      const conversationsList = document.getElementById('conversationsList');
+      
+      if (allCustomers.length === 0 && Object.keys(allMessages).length === 0) {
+        conversationsList.innerHTML = '<div style="padding: 1.5rem; text-align: center; color: var(--text-muted);">No customers found</div>';
+        return;
+      }
+
+      const renderedIds = new Set();
+      const conversationItems = [];
+
+      for (let customer of allCustomers) {
+        const messageCount = allMessages[customer.id]?.length || 0;
+        renderedIds.add(customer.id);
+        conversationItems.push(`
+          <div class="conversation-item ${selectedCustomerId === customer.id ? 'active' : ''}" onclick="selectConversation('${customer.id}', '${customer.name}', '${customer.email}')">
+            <div>
+              <div class="conversation-name">${customer.name}</div>
+              <div class="conversation-email">${customer.email}</div>
+            </div>
+            <div class="unread-badge">${messageCount}</div>
+          </div>
+        `);
+      }
+
+      // Include legacy conversation keys if there are any messages stored under email or unknown ids.
+      for (let key of Object.keys(allMessages)) {
+        if (!renderedIds.has(key) && allMessages[key].length > 0) {
+          conversationItems.push(`
+            <div class="conversation-item ${selectedCustomerId === key ? 'active' : ''}" onclick="selectConversation('${key}', '${key}', '${key}')">
+              <div>
+                <div class="conversation-name">Legacy conversation</div>
+                <div class="conversation-email">${key}</div>
+              </div>
+              <div class="unread-badge">${allMessages[key].length}</div>
+            </div>
+          `);
+        }
+      }
+
+      conversationsList.innerHTML = conversationItems.join('');
+    }
+
+    function selectConversation(customerId, name, email) {
+      selectedCustomerId = customerId;
+      renderConversationsList();
+      displayConversation(customerId, name, email);
+      startAdminChatPolling();
+    }
+
+    function displayConversation(customerId, name, email) {
+      const chatPanel = document.getElementById('chatPanel');
+      const messages = allMessages[customerId] || [];
+
+      chatPanel.innerHTML = `
+        <div class="chat-header-info">
+          <h3>${name}</h3>
+          <p>${email}</p>
+        </div>
+        <div class="chat-messages-container" id="chatMessagesContainer">
+          ${messages.length === 0 ? '<div style="text-align: center; color: var(--text-muted);">No messages yet</div>' : messages.map(msg => `
+            <div class="chat-message-${msg.sender === 'admin' ? 'admin' : 'customer'}">
+              <div class="chat-message-content">${msg.message}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="chat-input-admin">
+          <textarea id="adminMessageInput" placeholder="Type your response..." rows="1"></textarea>
+          <button onclick="sendAdminMessage('${customerId}')">Send</button>
+        </div>
+      `;
+
+      // Auto-scroll to bottom
+      const container = document.getElementById('chatMessagesContainer');
+      setTimeout(() => container.scrollTop = container.scrollHeight, 0);
+
+      // Focus input
+      document.getElementById('adminMessageInput').focus();
+    }
+
+    async function sendAdminMessage(customerId) {
+      const input = document.getElementById('adminMessageInput');
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      try {
+        input.value = '';
+        
+        await fetch(`${API_BASE}/chat/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerId,
+            message,
+            sender: 'admin',
+          }),
+        });
+
+        // Reload messages
+        const messagesRes = await fetch(`${API_BASE}/chat/${customerId}`);
+        allMessages[customerId] = await messagesRes.json();
+        
+        // Refresh the display
+        displayConversation(customerId, allCustomers.find(c => c.id === customerId).name, allCustomers.find(c => c.id === customerId).email);
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      }
+    }
+
+    function startAdminChatPolling() {
+      if (adminPollInterval) clearInterval(adminPollInterval);
+      adminPollInterval = setInterval(async () => {
+        if (selectedCustomerId) {
+          try {
+            const messagesRes = await fetch(`${API_BASE}/chat/${selectedCustomerId}`);
+            const newMessages = await messagesRes.json();
+            
+            if (newMessages.length !== (allMessages[selectedCustomerId] || []).length) {
+              allMessages[selectedCustomerId] = newMessages;
+              const customer = allCustomers.find(c => c.id === selectedCustomerId);
+              if (customer) {
+                displayConversation(selectedCustomerId, customer.name, customer.email);
+              }
+            }
+          } catch (error) {
+            console.error('Failed to poll admin messages:', error);
+          }
+        }
+      }, 3000); // Poll every 3 seconds
+    }
+
+    function stopAdminChatPolling() {
+      if (adminPollInterval) {
+        clearInterval(adminPollInterval);
+        adminPollInterval = null;
+      }
+    }
+
+
+    document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      document.getElementById('dashboardContainer').classList.remove('active');
+      document.getElementById('loginContainer').style.display = 'block';
+      document.getElementById('adminLoginForm').reset();
+      document.getElementById('logoutBtn').style.display = 'none';
+      currentAdmin = null;
+      stopAdminChatPolling();
+    });
+
+    const saved = localStorage.getItem('adminToken');
+    if (saved) {
+      currentAdmin = JSON.parse(saved);
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('dashboardContainer').classList.add('active');
+      document.getElementById('logoutBtn').style.display = 'block';
+      document.getElementById('adminGreeting').textContent = `Welcome, ${currentAdmin.username}`;
+      loadDashboard();
+    }
+  </script>
+</body>
+</html>

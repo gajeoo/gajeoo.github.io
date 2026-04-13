@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | WarehouseRide</title>
+  <meta name="description" content="Create a WarehouseRide customer account to manage transport bookings and customer details." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand" style="text-decoration: none;">
+        <img src="logo.svg" alt="WarehouseRide logo" class="brand-logo" />
+        <div>
+          <h1 class="brand-name">WarehouseRide</h1>
+          <p>Reliable transport for people and goods.</p>
+        </div>
+      </a>
+      <div id="main-nav-menu">
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="index.html#services">Services</a>
+          <a href="index.html#fleet">Fleet</a>
+          <a href="index.html#about">About</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <a href="signin.html" class="button button-secondary">Sign In</a>
+        <a href="signup.html" class="button button-primary">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section auth-page">
+    <div class="container section-header">
+      <p class="eyebrow">Customer sign-up</p>
+      <h2>Create your WarehouseRide account</h2>
+      <p>Join WarehouseRide and save time with faster booking, tracking, and account management.</p>
+    </div>
+
+    <div class="container auth-grid">
+      <div class="auth-card">
+        <h3>Get started</h3>
+        <p>Fill in your details to create a customer profile and access your transport dashboard.</p>
+
+        <form class="auth-form" data-mode="signup">
+          <label for="name">Full name</label>
+          <input id="name" type="text" placeholder="Your name" required />
+
+          <label for="email">Email address</label>
+          <input id="email" type="email" placeholder="you@example.com" required />
+
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Create a password" required />
+
+          <label for="confirmPassword">Confirm password</label>
+          <input id="confirmPassword" type="password" placeholder="Repeat your password" required />
+
+          <p class="form-message" aria-live="polite"></p>
+
+          <button type="submit" class="button button-primary">Create account</button>
+        </form>
+
+        <p class="form-note">Already have an account? <a href="signin.html">Sign in</a>.</p>
+      </div>
+
+      <div class="auth-card auth-intro-card">
+        <h3>Why join WarehouseRide?</h3>
+        <ul class="about-list">
+          <li>Faster booking approval</li>
+          <li>Saved service history</li>
+          <li>One-click support access</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+</html>

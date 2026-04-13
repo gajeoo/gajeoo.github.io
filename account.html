@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account | WarehouseRide</title>
+  <meta name="description" content="View your WarehouseRide customer account information, trips, and booking history." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand" style="text-decoration: none;">
+        <img src="logo.svg" alt="WarehouseRide logo" class="brand-logo" />
+        <div>
+          <h1 class="brand-name">WarehouseRide</h1>
+          <p>Reliable transport for people and goods.</p>
+        </div>
+      </a>
+      <div id="main-nav-menu">
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="index.html#services">Services</a>
+          <a href="index.html#fleet">Fleet</a>
+          <a href="index.html#about">About</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <a href="signin.html" class="button button-secondary">Sign In</a>
+        <a href="signup.html" class="button button-primary">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section account-page">
+    <div class="container section-header">
+      <p class="eyebrow">Your dashboard</p>
+      <h2>Customer account</h2>
+      <p>View your profile details, service activity, and account status.</p>
+    </div>
+
+    <div class="container account-grid">
+      <div class="auth-card account-state">
+        <h3>Account status</h3>
+        <p>Loading account information...</p>
+      </div>
+
+      <div class="auth-card account-summary">
+        <h3>Planned trips</h3>
+        <p>Your WarehouseRide account lets you schedule transport, track trips, and manage shipment details in one place.</p>
+        <div class="account-actions">
+          <a href="signin.html" class="button button-secondary">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="chat-widget.js"></script>
+</body>
+</html>
