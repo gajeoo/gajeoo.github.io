@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enquiry Confirmation | WarehouseRide</title>
+  <meta name="description" content="Your enquiry has been received by WarehouseRide." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .confirmation-page {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .confirmation-card {
+      max-width: 700px;
+      width: 100%;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    }
+
+    .confirmation-card h1 {
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .confirmation-card p {
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .confirmation-details {
+      margin: 1.5rem 0;
+      background: rgba(255,255,255,0.04);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .confirmation-details strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand" style="text-decoration: none;">
+        <img src="logo.svg" alt="WarehouseRide logo" class="brand-logo" />
+        <div>
+          <h1 class="brand-name">WarehouseRide</h1>
+          <p>Reliable transport for people and goods.</p>
+        </div>
+      </a>
+      <div id="main-nav-menu">
+        <nav class="main-nav">
+          <a href="index.html">Home</a>
+          <a href="index.html#services">Services</a>
+          <a href="index.html#fleet">Fleet</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <a href="dashboard.html" class="button button-secondary">Dashboard</a>
+        <a href="signin.html" class="button button-primary">Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="confirmation-page">
+    <article class="confirmation-card">
+      <h1>Enquiry Received</h1>
+      <p>Your request has been successfully submitted to WarehouseRide. Our team is reviewing the details and will contact you shortly to confirm your booking or quote.</p>
+
+      <div class="confirmation-details">
+        <div><strong>Service:</strong> <span id="confirmationService">-</span></div>
+        <div><strong>Message:</strong> <p id="confirmationMessage" style="margin: 0.5rem 0 0; white-space: pre-wrap;">-</p></div>
+        <div><strong>Received:</strong> <span id="confirmationReceived">-</span></div>
+      </div>
+
+      <div class="button-group">
+        <a href="dashboard.html" class="button button-primary">Go to Dashboard</a>
+        <a href="index.html" class="button button-secondary">Return Home</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© 2026 WarehouseRide. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#services">Services</a>
+        <a href="index.html#fleet">Fleet</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const enquiry = JSON.parse(localStorage.getItem('latestEnquiry') || 'null');
+    if (enquiry) {
+      document.getElementById('confirmationService').textContent = enquiry.subject || 'Quote request';
+      document.getElementById('confirmationMessage').textContent = enquiry.message || 'We have received your enquiry.';
+      document.getElementById('confirmationReceived').textContent = enquiry.receivedAt || new Date().toLocaleString();
+      localStorage.removeItem('latestEnquiry');
+    } else {
+      document.getElementById('confirmationService').textContent = 'Quote request';
+      document.getElementById('confirmationMessage').textContent = 'Your enquiry has been received. Our team will contact you soon.';
+      document.getElementById('confirmationReceived').textContent = new Date().toLocaleString();
+    }
+  </script>
+</body>
+</html>

@@ -218,9 +218,14 @@ if (contactForm) {
 
       const data = await response.json();
       if (response.ok) {
-        alert(`Thanks, ${name}! Your transport request for ${service} has been received. Our team will contact you shortly.`);
+        localStorage.setItem('latestEnquiry', JSON.stringify({
+          subject: service,
+          message: `Thank you, ${name}! Your quote request has been received. Our team will review it and get back to you soon.`,
+          receivedAt: new Date().toLocaleString(),
+        }));
+
         contactForm.reset();
-        window.location.href = 'dashboard.html';
+        window.location.href = 'enquiry-confirmation.html';
       } else {
         alert('Failed to submit enquiry. Please try again.');
       }

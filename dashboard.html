@@ -890,7 +890,10 @@
             <td>${message}</td>
             <td><span class="status-badge ${statusBadge}">${statusBadge}</span></td>
             <td>${date}</td>
-            <td><a href="#" class="action-link" onclick="viewEnquiry('${e.id}', '${(e.service_type || '').replace(/'/g, "\\'")}')"; return false;">View</a></td>
+                        <td>
+              <button type="button" class="action-link" onclick="openEnquiryModal('${e.id}')">View</button>
+              <button type="button" class="action-link" onclick="deleteEnquiry('${e.id}')">Delete</button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -1209,9 +1212,14 @@
           return;
         }
 
-        alert('Booking submitted successfully! Our team will contact you soon.');
+        localStorage.setItem('latestEnquiry', JSON.stringify({
+          subject: serviceType,
+          message: 'Booking request submitted successfully. Our team will contact you shortly.',
+          receivedAt: new Date().toLocaleString(),
+        }));
+
         document.getElementById('bookingForm').reset();
-        loadDashboard(); // Refresh enquiries
+        window.location.href = 'enquiry-confirmation.html';
       } catch (error) {
         console.error('Failed to submit booking:', error);
         alert('Unable to submit booking. Please try again later.');
