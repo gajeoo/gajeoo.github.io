@@ -814,17 +814,15 @@
     }
 
     // Pagination state
-    let currentPage = 1;
-    let totalPages = 1;
-    let isViewAll = false;
+    var currentPage = 1;
+    var totalPages = 1;
+    var isViewAll = false;
 
     async function loadDashboard(page = 1) {
       try {
-        console.log('[loadDashboard] Called with page:', page, '| isViewAll:', isViewAll);
         const enquiriesUrl = isViewAll
           ? `${API_BASE}/enquiries/${currentUser.id}?page=1&limit=1000`
           : `${API_BASE}/enquiries/${currentUser.id}?page=${page}&limit=7`;
-        console.log('[loadDashboard] Fetching URL:', enquiriesUrl);
 
         const [profileRes, enquiriesRes, chatRes] = await Promise.all([
           fetch(`${API_BASE}/customers/${currentUser.id}`),
@@ -839,12 +837,6 @@
         const profile = await profileRes.json();
         const enquiriesData = await enquiriesRes.json();
         const messages = await chatRes.json() || [];
-        
-        console.log('[loadDashboard] Enquiries data returned:', {
-          isArray: Array.isArray(enquiriesData),
-          length: enquiriesData.length || enquiriesData.enquiries?.length,
-          pagination: enquiriesData.pagination
-        });
 
         // Handle both array and paginated response formats
         let enquiries = [];
@@ -872,10 +864,7 @@
         if (pagination) {
           currentPage = pagination.page;
           totalPages = pagination.totalPages;
-          console.log('[loadDashboard] Set currentPage:', currentPage, '| totalPages:', totalPages, '| pagination:', pagination);
         }
-
-        console.log('[loadDashboard] About to render', enquiries.length, 'enquiries');
 
         updateStats(enquiries);
         renderEnquiries(enquiries);
@@ -1007,8 +996,6 @@
     function renderEnquiries(enquiries) {
       const tbody = document.getElementById('enquiriesBody');
       
-      console.log('[renderEnquiries] Called with', enquiries?.length, 'enquiries | isViewAll:', isViewAll);
-
       if (!tbody) {
         console.error('enquiriesBody element not found');
         return;
@@ -1034,9 +1021,7 @@
         return;
       }
 
-      const enquiriesToRender = isViewAll ? enquiries : enquiries.slice(0, 7);
-      console.log('[renderEnquiries] About to render', enquiriesToRender.length, 'enquiries:',
-        enquiriesToRender.map(e => ({ id: e.id, service: e.service_type, created: e.created_at })));
+      const enquiriesToRender = enquiries;
 
       tbody.innerHTML = enquiriesToRender.map(e => {
         const date = new Date(e.created_at).toLocaleDateString(undefined, {
@@ -1200,10 +1185,8 @@
     }
 
     function changePage(page) {
-      console.log('changePage called with:', page, 'current currentPage:', currentPage, 'totalPages:', totalPages);
       if (page < 1) return;  // Only block if less than 1
       currentPage = page;
-      console.log('Set currentPage to:', currentPage, 'Calling loadDashboard with page:', page);
       loadDashboard(page);
     }
 
