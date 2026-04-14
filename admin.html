@@ -227,28 +227,6 @@
       font-size: 0.95rem;
     }
 
-    .pagination-controls {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .pagination-controls.visible {
-      display: flex;
-    }
-
-    .pagination-controls button {
-      margin: 0 0.5rem;
-    }
-
-    #adminPageInfo {
-      margin: 0 1rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
     @media (max-width: 960px) {
       .admin-table {
         font-size: 0.9rem;
@@ -260,91 +238,6 @@
 
       .stats-grid {
         grid-template-columns: 1fr;
-      }
-
-      .chat-section {
-        grid-template-columns: 1fr;
-        height: auto;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .admin-table {
-        font-size: 0.8rem;
-      }
-
-      .admin-table th, .admin-table td {
-        padding: 0.5rem;
-        white-space: nowrap;
-      }
-
-      .admin-table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .pagination-controls {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-
-      .pagination-controls button {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.75rem !important;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .admin-header {
-        padding: 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-
-      .admin-header h1 {
-        font-size: 1.4rem;
-      }
-
-      .admin-section h2 {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-      }
-
-      .admin-table {
-        font-size: 0.7rem;
-      }
-
-      .admin-table th, .admin-table td {
-        padding: 0.3rem;
-      }
-
-      .stat-card {
-        padding: 1rem;
-      }
-
-      .stat-number {
-        font-size: 1.8rem;
-      }
-
-      .stat-label {
-        font-size: 0.85rem;
-      }
-
-      .chat-section {
-        grid-template-columns: 1fr;
-        height: auto;
-        max-height: 500px;
-      }
-
-      .pagination-controls button {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.5rem !important;
-        margin: 0.25rem !important;
-      }
-
-      #adminPageInfo {
-        font-size: 0.85rem;
       }
     }
 
@@ -518,6 +411,38 @@
       color: var(--text-muted);
       font-size: 1.1rem;
     }
+
+    .pagination-controls {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .pagination-controls.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pagination-controls button {
+      margin: 0 0.25rem;
+    }
+
+    .pagination-controls button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #adminPageInfo {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 1rem;
+    }
   </style>
 </head>
 <body>
@@ -584,45 +509,41 @@
 
         <div class="admin-section">
           <h2>Recent Customers</h2>
-          <div class="admin-table-wrapper">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Company</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Company</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody id="customersTableBody">
               <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
             </tbody>
           </table>
-          </div>
         </div>
 
         <div class="admin-section">
           <h2>Enquiries</h2>
-          <div class="admin-table-wrapper">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Email</th>
-                  <th>Service</th>
-                  <th>Message</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="enquiriesTableBody">
-                <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Service</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enquiriesTableBody">
+              <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+            </tbody>
+          </table>
           <div id="adminPaginationControls" class="pagination-controls">
             <button id="adminPrevPage" class="action-link" style="margin-right: 1rem;" onclick="changeAdminPage(currentAdminPage - 1)">Previous</button>
             <span id="adminPageInfo"></span>
@@ -642,26 +563,6 @@
               <div class="no-conversation">Select a conversation to chat with the customer</div>
             </div>
           </div>
-        </div>
-
-        <div class="admin-section">
-          <h2>Footer Settings</h2>
-          <form id="footerForm" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; padding: 1.5rem;">
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Working Hours</label>
-              <textarea id="footerWorkingHours" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., Mon-Fri: 9AM-6PM, Sat: 10AM-4PM"></textarea>
-            </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Social Media Links</label>
-              <textarea id="footerSocialMedia" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., Facebook: https://facebook.com/warehouseride&#10;Twitter: https://twitter.com/warehouseride"></textarea>
-            </div>
-            <div style="margin-bottom: 1.5rem;">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--primary);">Location</label>
-              <textarea id="footerLocation" rows="2" style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; background: rgba(255, 255, 255, 0.05); color: var(--text);" placeholder="e.g., 123 Transport Street, Logistics City, LC 12345"></textarea>
-            </div>
-            <button type="submit" style="padding: 0.75rem 1.5rem; background: var(--primary); color: #08101f; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">Save Footer Settings</button>
-            <div id="footerMessage" style="margin-top: 1rem;"></div>
-          </form>
         </div>
       </div>
     </main>
@@ -688,7 +589,7 @@
   </div>
 
   <script>
-    const API_BASE = 'https://zealous-fulfillment-production-58f1.up.railway.app/api';
+    const API_BASE = 'http://localhost:5000/api';
     let currentAdmin = null;
 
     function closeModal(selector) {
@@ -736,6 +637,7 @@
       }
     }
 
+    // Pagination state
     var currentAdminPage = 1;
     var adminTotalPages = 1;
     var adminIsViewAll = false;
@@ -804,7 +706,7 @@
         return;
       }
 
-      tbody.innerHTML = customers.slice(0, 7).map(c => `
+      tbody.innerHTML = customers.map(c => `
         <tr>
           <td><strong>${c.name}</strong></td>
           <td>${c.email}</td>
@@ -823,7 +725,7 @@
         return;
       }
 
-      tbody.innerHTML = (adminIsViewAll ? enquiries : enquiries.slice(0, 7)).map(e => `
+      tbody.innerHTML = enquiries.map(e => `
         <tr>
           <td><strong>${e.name}</strong></td>
           <td>${e.email}</td>
@@ -834,6 +736,51 @@
           <td><button class="action-btn" onclick="viewEnquiryDetails('${e.id}')">View</button></td>
         </tr>
       `).join('');
+    }
+
+    function renderAdminPagination(pagination) {
+      const controls = document.getElementById('adminPaginationControls');
+      const pageInfo = document.getElementById('adminPageInfo');
+      const prevBtn = document.getElementById('adminPrevPage');
+      const nextBtn = document.getElementById('adminNextPage');
+      const viewAllBtn = document.getElementById('adminViewAllBtn');
+
+      // Show pagination controls if we have more than 7 enquiries total
+      if (!pagination || pagination.total <= 7) {
+        controls.classList.remove('visible');
+        return;
+      }
+
+      controls.classList.add('visible');
+
+      if (adminIsViewAll) {
+        // In View All mode, hide pagination buttons and show toggle only
+        pageInfo.style.display = 'none';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        viewAllBtn.textContent = 'Back to Paginated View (7 per page)';
+      } else {
+        // In paginated mode, show all pagination controls
+        pageInfo.style.display = 'inline';
+        prevBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'inline-block';
+        pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total})`;
+        prevBtn.disabled = pagination.page <= 1;
+        nextBtn.disabled = pagination.page >= pagination.totalPages;
+        viewAllBtn.textContent = 'View All Enquiries';
+      }
+    }
+
+    function changeAdminPage(page) {
+      if (page < 1) return;  // Only block if less than 1
+      currentAdminPage = page;
+      loadDashboard(page);
+    }
+
+    function toggleAdminViewAll() {
+      adminIsViewAll = !adminIsViewAll;
+      currentAdminPage = 1;
+      loadDashboard(currentAdminPage);
     }
 
     async function viewCustomerDetails(customerId) {
@@ -1080,95 +1027,7 @@
     }
 
 
-    // Admin pagination functions
-    function renderAdminPagination(pagination) {
-      const controls = document.getElementById('adminPaginationControls');
-      const pageInfo = document.getElementById('adminPageInfo');
-      const prevBtn = document.getElementById('adminPrevPage');
-      const nextBtn = document.getElementById('adminNextPage');
-      const viewAllBtn = document.getElementById('adminViewAllBtn');
-
-      // Show pagination controls if we have more than 7 enquiries total
-      if (!pagination || pagination.total <= 7) {
-        controls.classList.remove('visible');
-        return;
-      }
-
-      controls.classList.add('visible');
-
-      if (adminIsViewAll) {
-        // In View All mode, hide pagination buttons and show toggle only
-        pageInfo.style.display = 'none';
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-        viewAllBtn.textContent = 'Back to Paginated View (7 per page)';
-      } else {
-        // In paginated mode, show all pagination controls
-        pageInfo.style.display = 'inline';
-        prevBtn.style.display = 'inline-block';
-        nextBtn.style.display = 'inline-block';
-        pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total})`;
-        prevBtn.disabled = pagination.page <= 1;
-        nextBtn.disabled = pagination.page >= pagination.totalPages;
-        viewAllBtn.textContent = 'View All Enquiries';
-      }
-    }
-
-    function changeAdminPage(page) {
-      if (page < 1) return;  // Only block if less than 1
-      currentAdminPage = page;
-      loadDashboard(page);
-    }
-
-    function toggleAdminViewAll() {
-      adminIsViewAll = !adminIsViewAll;
-      currentAdminPage = 1;
-      loadDashboard(currentAdminPage);
-    }
-
-    // Footer settings functions
-    async function loadFooterSettings() {
-      try {
-        const response = await fetch(`${API_BASE}/footer`);
-        const footer = await response.json();
-
-        document.getElementById('footerWorkingHours').value = footer.working_hours || '';
-        document.getElementById('footerSocialMedia').value = footer.social_media || '';
-        document.getElementById('footerLocation').value = footer.location || '';
-      } catch (error) {
-        console.error('Failed to load footer settings:', error);
-      }
-    }
-
-    async function handleFooterSubmit(e) {
-      e.preventDefault();
-      const messageEl = document.getElementById('footerMessage');
-
-      const workingHours = document.getElementById('footerWorkingHours').value;
-      const socialMedia = document.getElementById('footerSocialMedia').value;
-      const location = document.getElementById('footerLocation').value;
-
-      try {
-        const response = await fetch(`${API_BASE}/admin/footer`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ working_hours: workingHours, social_media: socialMedia, location: location }),
-        });
-
-        if (response.ok) {
-          messageEl.textContent = 'Footer settings saved successfully!';
-          messageEl.style.color = '#c4ffc4';
-        } else {
-          throw new Error('Failed to save footer settings');
-        }
-      } catch (error) {
-        messageEl.textContent = 'Failed to save footer settings. Please try again.';
-        messageEl.style.color = '#ffaeae';
-      }
-    }
-
     document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
-    document.getElementById('footerForm').addEventListener('submit', handleFooterSubmit);
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('adminToken');

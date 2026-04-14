@@ -117,16 +117,6 @@ const initDb = async () => {
       )
     `);
 
-    await dbRun(`
-      CREATE TABLE IF NOT EXISTS footer_settings (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        working_hours TEXT,
-        social_media TEXT,
-        location TEXT,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
     console.log('Database tables initialized');
   } catch (error) {
     console.error('Database initialization error:', error);
@@ -293,7 +283,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     await sendEmail(
       email,
       'Password Reset Request',
-      `<h2>Reset Your Password</h2><p>Click <a href="https://gajeoo.github.io/reset-password.html?token=${token}">here</a> to reset your password. This link expires in 1 hour.</p>`
+      `<h2>Reset Your Password</h2><p>Click <a href="http://localhost:3000/reset-password.html?token=${token}">here</a> to reset your password. This link expires in 1 hour.</p>`
     );
 
     res.json({ success: true, message: 'Reset link sent to email' });
@@ -374,71 +364,14 @@ app.post('/api/enquiries', async (req, res) => {
 // Get Enquiries by Customer
 app.get('/api/enquiries/:customerId', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 7;
-    const offset = (page - 1) * limit;
-
     const enquiries = await dbAll(
-      'SELECT * FROM enquiries WHERE customer_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [req.params.customerId, limit, offset]
-    );
-
-    const total = await dbGet(
-      'SELECT COUNT(*) as count FROM enquiries WHERE customer_id = ?',
+      'SELECT * FROM enquiries WHERE customer_id = ? ORDER BY created_at DESC',
       [req.params.customerId]
     );
-
-    res.json({
-      enquiries,
-      pagination: {
-        page,
-        limit,
-        total: total.count,
-        totalPages: Math.ceil(total.count / limit)
-      }
-    });
+    res.json(enquiries);
   } catch (error) {
     console.error('Fetch enquiries error:', error);
     res.status(500).json({ error: 'Failed to fetch enquiries' });
-  }
-});
-
-// Delete Enquiry
-app.delete('/api/enquiries/:enquiryId', async (req, res) => {
-  try {
-    const { customerId } = req.body;
-    if (!customerId) {
-      return res.status(400).json({ error: 'Customer ID required' });
-    }
-
-    const resolvedCustomerId = await resolveCustomerId(customerId);
-    if (!resolvedCustomerId) {
-      return res.status(400).json({ error: 'Invalid customer reference' });
-    }
-
-    const enquiry = await dbGet('SELECT customer_id, created_at FROM enquiries WHERE id = ?', [req.params.enquiryId]);
-    if (!enquiry) {
-      return res.status(404).json({ error: 'Enquiry not found' });
-    }
-
-    if (enquiry.customer_id !== resolvedCustomerId) {
-      return res.status(403).json({ error: 'Unauthorized to delete this enquiry' });
-    }
-
-    // Check if enquiry is at least 20 days old
-    const createdDate = new Date(enquiry.created_at);
-    const now = new Date();
-    const daysDiff = (now - createdDate) / (1000 * 60 * 60 * 24);
-
-    if (daysDiff < 20) {
-      return res.status(400).json({ error: 'Enquiries can only be deleted after 20 days' });
-    }
-
-    await dbRun('DELETE FROM enquiries WHERE id = ?', [req.params.enquiryId]);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Delete enquiry error:', error);
-    res.status(500).json({ error: 'Failed to delete enquiry' });
   }
 });
 
@@ -568,29 +501,13 @@ app.get('/api/admin/customers', async (req, res) => {
 // Get All Enquiries
 app.get('/api/admin/enquiries', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 7;
-    const offset = (page - 1) * limit;
-
     const enquiries = await dbAll(`
       SELECT e.id, e.customer_id, c.name, c.email, e.service_type, e.message, e.status, e.created_at
       FROM enquiries e
       JOIN customers c ON e.customer_id = c.id
       ORDER BY e.created_at DESC
-      LIMIT ? OFFSET ?
-    `, [limit, offset]);
-
-    const total = await dbGet('SELECT COUNT(*) as count FROM enquiries');
-    
-    res.json({
-      enquiries,
-      pagination: {
-        page,
-        limit,
-        total: total.count,
-        totalPages: Math.ceil(total.count / limit)
-      }
-    });
+    `);
+    res.json(enquiries);
   } catch (error) {
     console.error('Fetch enquiries error:', error);
     res.status(500).json({ error: 'Failed to fetch enquiries' });
@@ -673,33 +590,6 @@ app.post('/api/admin/create', async (req, res) => {
   }
 });
 
-// Footer settings endpoints
-app.get('/api/footer', async (req, res) => {
-  try {
-    const footer = await dbGet('SELECT * FROM footer_settings WHERE id = 1');
-    res.json(footer || { working_hours: '', social_media: '', location: '' });
-  } catch (error) {
-    console.error('Get footer error:', error);
-    res.status(500).json({ error: 'Failed to get footer settings' });
-  }
-});
-
-app.put('/api/admin/footer', async (req, res) => {
-  try {
-    const { working_hours, social_media, location } = req.body;
-
-    await dbRun(`
-      INSERT OR REPLACE INTO footer_settings (id, working_hours, social_media, location, updated_at)
-      VALUES (1, ?, ?, ?, CURRENT_TIMESTAMP)
-    `, [working_hours || '', social_media || '', location || '']);
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Update footer error:', error);
-    res.status(500).json({ error: 'Failed to update footer settings' });
-  }
-});
-
 // Initialize server
 (async () => {
   await initDb();
@@ -718,8 +608,8 @@ app.put('/api/admin/footer', async (req, res) => {
   }
 
   app.listen(PORT, () => {
-    console.log(`Backend server running on https://gajeoo.github.io`);
+    console.log(`Backend server running on http://localhost:${PORT}`);
     console.log('API endpoints available at /api/*');
-    console.log('Admin dashboard at https://gajeoo.github.io/admin.html');
+    console.log('Admin dashboard at http://localhost:' + PORT + '/admin.html');
   });
 })();

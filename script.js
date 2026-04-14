@@ -3,7 +3,7 @@ const AUTH_FORM_SELECTOR = '.auth-form';
 const ACCOUNT_STATE_SELECTOR = '.account-state';
 const SIGN_OUT_BUTTON_ID = 'signOutButton';
 const CURRENT_USER_KEY = 'warehouseRideCurrent';
-const API_BASE = typeof window !== 'undefined' ? 'https://zealous-fulfillment-production-58f1.up.railway.app/api' : '';
+const API_BASE = typeof window !== 'undefined' ? 'http://localhost:5000/api' : '';
 
 const contactForm = document.querySelector(CONTACT_FORM_SELECTOR);
 const authForm = document.querySelector(AUTH_FORM_SELECTOR);
@@ -218,14 +218,9 @@ if (contactForm) {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('latestEnquiry', JSON.stringify({
-          subject: service,
-          message: `Thank you, ${name}! Your quote request has been received. Our team will review it and get back to you soon.`,
-          receivedAt: new Date().toLocaleString(),
-        }));
-
+        alert(`Thanks, ${name}! Your transport request for ${service} has been received. Our team will contact you shortly.`);
         contactForm.reset();
-        window.location.href = 'enquiry-confirmation.html';
+        window.location.href = 'dashboard.html';
       } else {
         alert('Failed to submit enquiry. Please try again.');
       }

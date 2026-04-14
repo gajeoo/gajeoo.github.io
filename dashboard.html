@@ -209,28 +209,6 @@
       color: var(--primary);
     }
 
-    .pagination-controls {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .pagination-controls.visible {
-      display: flex;
-    }
-
-    .pagination-controls button {
-      margin: 0 0.5rem;
-    }
-
-    #pageInfo {
-      margin: 0 1rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
     @media (max-width: 960px) {
       .dashboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -257,78 +235,6 @@
       .section-header {
         flex-direction: column;
         align-items: flex-start;
-      }
-
-      .dashboard-table {
-        font-size: 0.8rem;
-      }
-
-      .dashboard-table th, .dashboard-table td {
-        padding: 0.5rem;
-        white-space: nowrap;
-      }
-
-      .dashboard-table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .pagination-controls {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-
-      .pagination-controls button {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.75rem !important;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .dashboard-hero {
-        padding: 1rem;
-      }
-
-      .dashboard-hero h2 {
-        font-size: 1.3rem;
-      }
-
-      .dashboard-stat-number {
-        font-size: 1.8rem;
-      }
-
-      .section-header h3 {
-        font-size: 1.2rem;
-      }
-
-      .dashboard-table {
-        font-size: 0.7rem;
-      }
-
-      .dashboard-table th, .dashboard-table td {
-        padding: 0.3rem;
-      }
-
-      .profile-box {
-        padding: 1rem;
-      }
-
-      .profile-item {
-        padding: 0.5rem 0;
-      }
-
-      .pagination-controls {
-        margin-top: 1rem;
-      }
-
-      .pagination-controls button {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.5rem !important;
-        margin: 0.25rem !important;
-      }
-
-      #pageInfo {
-        font-size: 0.85rem;
       }
     }
 
@@ -398,6 +304,38 @@
       outline: none;
       border-color: #5dd1ff;
       background: rgba(255, 255, 255, 0.08);
+    }
+
+    .pagination-controls {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .pagination-controls.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pagination-controls button {
+      margin: 0 0.25rem;
+    }
+
+    .pagination-controls button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #pageInfo {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0 1rem;
     }
   </style>
 </head>
@@ -485,29 +423,27 @@
           <h3>Your Enquiries</h3>
           <a href="index.html#contact" class="action-link">+ New Enquiry</a>
         </div>
-        <div class="dashboard-table-wrapper">
-          <table class="dashboard-table">
-            <thead>
-              <tr>
-                <th>Service Type</th>
-                <th>Message</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="enquiriesBody">
-              <tr>
-                <td colspan="5" style="text-align: center; padding: 2rem;">
-                  <div class="empty-state">
-                    <p>No enquiries yet</p>
-                    <p style="font-size: 0.9rem;">Start your first transport request</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Service Type</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="enquiriesBody">
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 2rem;">
+                <div class="empty-state">
+                  <p>No enquiries yet</p>
+                  <p style="font-size: 0.9rem;">Start your first transport request</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <div id="paginationControls" class="pagination-controls">
           <button id="prevPage" class="action-link" style="margin-right: 1rem;" onclick="changePage(currentPage - 1)">Previous</button>
           <span id="pageInfo"></span>
@@ -799,7 +735,7 @@
   </footer>
 
   <script>
-    const API_BASE = 'https://zealous-fulfillment-production-58f1.up.railway.app/api';
+    const API_BASE = 'http://localhost:5000/api';
     const currentUser = (() => {
       const raw = localStorage.getItem('warehouseRideCurrent');
       try {
@@ -995,17 +931,11 @@
 
     function renderEnquiries(enquiries) {
       const tbody = document.getElementById('enquiriesBody');
-      
+
       if (!tbody) {
         console.error('enquiriesBody element not found');
         return;
       }
-
-      // Cache enquiries for modal access
-      window.enquiryCache = {};
-      enquiries.forEach(e => {
-        window.enquiryCache[e.id] = e;
-      });
 
       if (!enquiries || enquiries.length === 0) {
         tbody.innerHTML = `
@@ -1021,9 +951,7 @@
         return;
       }
 
-      const enquiriesToRender = enquiries;
-
-      tbody.innerHTML = enquiriesToRender.map(e => {
+      tbody.innerHTML = enquiries.map(e => {
         const date = new Date(e.created_at).toLocaleDateString(undefined, {
           month: 'short',
           day: 'numeric',
@@ -1032,13 +960,6 @@
 
         const statusBadge = e.status || 'new';
         const message = e.message ? (e.message.length > 60 ? e.message.substring(0, 60) + '...' : e.message) : 'No details';
-        
-        // Calculate days since enquiry was created
-        const createdDate = new Date(e.created_at);
-        const now = new Date();
-        const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
-        const canDelete = daysDiff >= 20;
-        const daysRemaining = Math.max(0, 20 - daysDiff);
 
         return `
           <tr>
@@ -1046,109 +967,13 @@
             <td>${message}</td>
             <td><span class="status-badge ${statusBadge}">${statusBadge}</span></td>
             <td>${date}</td>
-            <td>
+                        <td>
               <button type="button" class="action-link" onclick="openEnquiryModal('${e.id}')">View</button>
-              ${canDelete ? `<button type="button" class="action-link" onclick="deleteEnquiry('${e.id}')">Delete</button>` : `<button type="button" class="action-link" disabled style="opacity: 0.5; cursor: not-allowed;" title="Can delete in ${daysRemaining} days">Delete in ${daysRemaining}d</button>`}
+              <button type="button" class="action-link" onclick="deleteEnquiry('${e.id}')">Delete</button>
             </td>
           </tr>
         `;
       }).join('');
-    }
-
-    function renderChat(messages) {
-      const container = document.getElementById('chatHistoryContainer');
-
-      if (messages.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <p>No chat messages yet</p>
-            <p style="font-size: 0.9rem;">Use the chat widget on any page to communicate with our support team</p>
-          </div>
-        `;
-        return;
-      }
-
-      const html = messages.map(m => {
-        const time = new Date(m.created_at).toLocaleString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-
-        return `
-          <div style="padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); ${m.sender === 'customer' ? 'background: rgba(93, 209, 255, 0.05);' : ''}">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-              <strong style="color: ${m.sender === 'customer' ? '#5dd1ff' : '#c4ffc4'};">${m.sender === 'customer' ? 'You' : 'Support'}</strong>
-              <span style="color: #9bb3cf; font-size: 0.85rem;">${time}</span>
-            </div>
-            <p style="margin: 0; color: #f5f7fb;">${m.message}</p>
-          </div>
-        `;
-      }).join('');
-
-      container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${html}</div>`;
-    }
-
-    function viewEnquiry(enquiryId) {
-      openEnquiryModal(enquiryId);
-    }
-
-    function openEnquiryModal(enquiryId) {
-      const enquiry = window.enquiryCache?.[enquiryId];
-      if (!enquiry) {
-        alert('Unable to load enquiry details.');
-        return;
-      }
-
-      const modal = document.getElementById('enquiryModal');
-      if (!modal) return;
-
-      document.getElementById('enquiryModalService').textContent = enquiry.service_type || 'Unknown';
-      document.getElementById('enquiryModalMessage').textContent = enquiry.message || 'No message provided.';
-      document.getElementById('enquiryModalStatus').textContent = enquiry.status || 'new';
-      document.getElementById('enquiryModalCreated').textContent = new Date(enquiry.created_at).toLocaleString();
-      document.getElementById('deleteEnquiryBtn').dataset.enquiryId = enquiry.id;
-
-      modal.style.display = 'flex';
-    }
-
-    function closeEnquiryModal() {
-      const modal = document.getElementById('enquiryModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    async function deleteEnquiry(enquiryId) {
-      if (!confirm('Delete this enquiry? This cannot be undone.')) return;
-
-      try {
-        const response = await fetch(`${API_BASE}/enquiries/${encodeURIComponent(enquiryId)}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ customerId: currentUser.id }),
-        });
-
-        if (!response.ok) {
-          const contentType = response.headers.get('content-type');
-          let error = 'Delete failed';
-          
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json();
-            error = data.error || error;
-          } else {
-            error = `Server error: ${response.status} ${response.statusText}`;
-          }
-          throw new Error(error);
-        }
-
-        const data = await response.json();
-        alert('Enquiry deleted successfully.');
-        closeEnquiryModal();
-        loadDashboard(currentPage);
-      } catch (error) {
-        console.error('Delete enquiry error:', error);
-        alert(error.message || 'Unable to delete enquiry. Please try again later.');
-      }
     }
 
     function renderPagination(pagination) {
@@ -1196,6 +1021,45 @@
       loadDashboard(currentPage);
     }
 
+    function renderChat(messages) {
+      const container = document.getElementById('chatHistoryContainer');
+
+      if (messages.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>No chat messages yet</p>
+            <p style="font-size: 0.9rem;">Use the chat widget on any page to communicate with our support team</p>
+          </div>
+        `;
+        return;
+      }
+
+      const html = messages.map(m => {
+        const time = new Date(m.created_at).toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        return `
+          <div style="padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); ${m.sender === 'customer' ? 'background: rgba(93, 209, 255, 0.05);' : ''}">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <strong style="color: ${m.sender === 'customer' ? '#5dd1ff' : '#c4ffc4'};">${m.sender === 'customer' ? 'You' : 'Support'}</strong>
+              <span style="color: #9bb3cf; font-size: 0.85rem;">${time}</span>
+            </div>
+            <p style="margin: 0; color: #f5f7fb;">${m.message}</p>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `<div style="max-height: 400px; overflow-y: auto;">${html}</div>`;
+    }
+
+    function viewEnquiry(enquiryId, serviceType) {
+      alert(`Service: ${serviceType || 'Unknown'}\nEnquiry ID: ${enquiryId}\n\nUse the chat widget to communicate with our team about this enquiry.`);
+    }
+
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('warehouseRideCurrent');
       window.location.href = 'signin.html';
@@ -1224,33 +1088,17 @@
       });
     }
 
-    // Close settings button and form submission should wait for the full DOM.
-    document.addEventListener('DOMContentLoaded', () => {
-      const closeSettingsBtn = document.getElementById('closeSettings');
-      if (closeSettingsBtn) {
-        closeSettingsBtn.addEventListener('click', closeSettingsModal);
-      }
+    // Close settings button
+    const closeSettingsBtn = document.getElementById('closeSettings');
+    if (closeSettingsBtn) {
+      closeSettingsBtn.addEventListener('click', closeSettingsModal);
+    }
 
-      const settingsForm = document.getElementById('settingsForm');
-      if (settingsForm) {
-        settingsForm.addEventListener('submit', saveSettings);
-      }
-
-      const closeEnquiryBtn = document.getElementById('closeEnquiryModal');
-      if (closeEnquiryBtn) {
-        closeEnquiryBtn.addEventListener('click', closeEnquiryModal);
-      }
-
-      const deleteEnquiryBtn = document.getElementById('deleteEnquiryBtn');
-      if (deleteEnquiryBtn) {
-        deleteEnquiryBtn.addEventListener('click', () => {
-          const enquiryId = deleteEnquiryBtn.dataset.enquiryId;
-          if (enquiryId) {
-            deleteEnquiry(enquiryId);
-          }
-        });
-      }
-    });
+    // Settings form submission
+    const settingsForm = document.getElementById('settingsForm');
+    if (settingsForm) {
+      settingsForm.addEventListener('submit', saveSettings);
+    }
 
     // Address Autocomplete Function
     async function fetchAddressSuggestions(query) {
@@ -1422,14 +1270,9 @@
           return;
         }
 
-        localStorage.setItem('latestEnquiry', JSON.stringify({
-          subject: serviceType,
-          message: 'Booking request submitted successfully. Our team will contact you shortly.',
-          receivedAt: new Date().toLocaleString(),
-        }));
-
+        alert('Booking submitted successfully! Our team will contact you soon.');
         document.getElementById('bookingForm').reset();
-        window.location.href = 'enquiry-confirmation.html';
+        loadDashboard(); // Refresh enquiries
       } catch (error) {
         console.error('Failed to submit booking:', error);
         alert('Unable to submit booking. Please try again later.');
@@ -1439,47 +1282,5 @@
     loadDashboard();
   </script>
   <script src="chat-widget.js"></script>
-
-  <!-- Enquiry Details Modal -->
-  <div id="enquiryModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Enquiry Details</h3>
-        <button id="closeEnquiryModal" class="close-btn">&times;</button>
-      </div>
-      <div style="display: grid; gap: 1rem;">
-        <div><strong>Service:</strong> <span id="enquiryModalService">-</span></div>
-        <div><strong>Status:</strong> <span id="enquiryModalStatus">-</span></div>
-        <div><strong>Submitted:</strong> <span id="enquiryModalCreated">-</span></div>
-        <div><strong>Message:</strong><p id="enquiryModalMessage" style="margin: 0.5rem 0 0; white-space: pre-wrap;">-</p></div>
-        <button id="deleteEnquiryBtn" class="button button-danger" type="button" style="width: 100%;">Delete Enquiry</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Account Settings</h3>
-        <button id="closeSettings" class="close-btn">&times;</button>
-      </div>
-      <form id="settingsForm">
-        <label>
-          Full Name
-          <input type="text" id="settingsName" required />
-        </label>
-        <label>
-          Company
-          <input type="text" id="settingsCompany" />
-        </label>
-        <label>
-          Phone Number
-          <input type="tel" id="settingsPhone" />
-        </label>
-        <button type="submit" style="width: 100%; padding: 1rem; background: #5dd1ff; color: #08101f; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; margin-top: 1rem;">Save Changes</button>
-      </form>
-    </div>
-  </div>
 </body>
 </html>

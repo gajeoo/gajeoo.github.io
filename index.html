@@ -412,33 +412,12 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4>WarehouseRide</h4>
-          <p id="footerLocation">Your trusted logistics partner</p>
-        </div>
-        <div class="footer-section">
-          <h4>Working Hours</h4>
-          <p id="footerWorkingHours">Mon-Fri: 9AM-6PM<br>Sat: 10AM-4PM</p>
-        </div>
-        <div class="footer-section">
-          <h4>Follow Us</h4>
-          <div id="footerSocialMedia">
-            <p>Social media links coming soon</p>
-          </div>
-        </div>
-        <div class="footer-section">
-          <h4>Quick Links</h4>
-          <div class="footer-links">
-            <a href="index.html">Home</a>
-            <a href="#services">Services</a>
-            <a href="#fleet">Fleet</a>
-            <a href="#contact">Contact</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2026 WarehouseRide. All rights reserved.</p>
+      <p>© 2026 WarehouseRide. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="#services">Services</a>
+        <a href="#fleet">Fleet</a>
+        <a href="#contact">Contact</a>
       </div>
     </div>
   </footer>
@@ -458,33 +437,6 @@
       dashboardLink.style.display = 'none';
       signInLink.style.display = 'inline-flex';
     }
-
-    // Load footer settings
-    async function loadFooterSettings() {
-      try {
-        const response = await fetch('https://zealous-fulfillment-production-58f1.up.railway.app/api/footer');
-        const footer = await response.json();
-
-        document.getElementById('footerWorkingHours').textContent = footer.working_hours || 'Mon-Fri: 9AM-6PM\nSat: 10AM-4PM';
-        document.getElementById('footerLocation').textContent = footer.location || 'Your trusted logistics partner';
-        
-        if (footer.social_media) {
-          document.getElementById('footerSocialMedia').innerHTML = footer.social_media.split('\n').map(line => {
-            if (line.includes(':')) {
-              const [platform, url] = line.split(':').map(s => s.trim());
-              return `<a href="${url}" target="_blank" style="color: var(--primary); text-decoration: none; margin-right: 1rem;">${platform}</a>`;
-            }
-            return `<p>${line}</p>`;
-          }).join('');
-        } else {
-          document.getElementById('footerSocialMedia').innerHTML = '<p>Social media links coming soon</p>';
-        }
-      } catch (error) {
-        console.error('Failed to load footer settings:', error);
-      }
-    }
-
-    loadFooterSettings();
   </script>
 </body>
 </html>
